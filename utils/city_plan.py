@@ -1,12 +1,15 @@
 class CityPlan:
-    def __init__(self, n_intersections, streets, bonus_points, duration, cars):
+    def __init__(self, n_intersections, streets, bonus_points, duration, cars, street_to_idx_dict, idx_to_street_list):
         self.n_intersections = n_intersections
         self.streets = streets
         self.bonus_points = bonus_points
         self.duration = duration
         self.cars = cars
+        self.street_to_idx_dict = street_to_idx_dict
+        self.idx_to_street_list = idx_to_street_list
 
-        self.incoming_streets = self._calculate_all_incoming_streets()
+        self.all_incoming_streets = self._calculate_all_incoming_streets()
+        self.cars_on_all_streets = self._calculate_cars_on_all_streets()
 
     def incoming_streets(self, intersection):
         return [street for street in self.streets if street['connection'][1] == intersection]
@@ -14,13 +17,20 @@ class CityPlan:
     def outgoing_streets(self, intersection):
         return [street for street in self.streets if street['connection'][0] == intersection]
 
+    def _calculate_cars_on_all_streets(self):
+        cars_on_all_streets = [[] for _ in range(len(self.streets))]
+        for car_number, path in enumerate(self.cars):
+            for intersection in path:
+                cars_on_all_streets[intersection].append(car_number)
+        return cars_on_all_streets
+
     def _calculate_all_incoming_streets(self):
         return [self.incoming_streets(intersection) for intersection in range(self.n_intersections)]
 
 
 def load_city_plan(filepath):
     street_number = 0
-    car_counter = 0
+    car_number = 0
 
     first_line = True
     with open(filepath, 'r') as f:
@@ -48,10 +58,17 @@ def load_city_plan(filepath):
                     street_list[street_number]['length'] = (int(line_split[3]))
 
                     street_number += 1
+
+                # Else add information for cars
                 else:
-                    car_list[int(line_split[0])] = [street_to_idx_dict[street_name] for street_name in line_split[1:]]
+                    car_list[car_number] = [street_to_idx_dict[street_name] for street_name in line_split[1:]]
 
-                    car_counter += 1
+                    car_number += 1
 
-
-    return
+    return CityPlan(n_intersections=n_intersections,
+                    streets=street_list,
+                    bonus_points=bonus_points,
+                    duration=duration,
+                    cars=car_list,
+                    street_to_idx_dict=street_to_idx_dict,
+                    idx_to_street_list=idx_to_street_list)

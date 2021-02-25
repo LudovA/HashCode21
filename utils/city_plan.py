@@ -12,16 +12,16 @@ class CityPlan:
         self.cars_on_all_streets = self._calculate_cars_on_all_streets()
 
     def incoming_streets(self, intersection):
-        return [street for street in self.streets if street['connection'][1] == intersection]
+        return [street_number for street_number, street in enumerate(self.streets) if street['connection'][1] == intersection]
 
     def outgoing_streets(self, intersection):
-        return [street for street in self.streets if street['connection'][0] == intersection]
+        return [street_number for street_number, street in enumerate(self.streets) if street['connection'][0] == intersection]
 
     def _calculate_cars_on_all_streets(self):
         cars_on_all_streets = [[] for _ in range(len(self.streets))]
         for car_number, path in enumerate(self.cars):
-            for intersection in path:
-                cars_on_all_streets[intersection].append(car_number)
+            for street_number in path:
+                cars_on_all_streets[street_number].append(car_number)
         return cars_on_all_streets
 
     def _calculate_all_incoming_streets(self):

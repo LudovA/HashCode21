@@ -9,8 +9,10 @@ def plot_histogram(values, bins, title='Histogram', output_dir=os.path.join(os.p
     plt.title(title)
     plt.xlabel('Values')
     plt.ylabel('Count')
-    plt.show()
 
     if output_dir:
         output_path = os.path.join(output_dir, title + '.png')
         plt.savefig(output_path)
+
+    plt.show()
+
